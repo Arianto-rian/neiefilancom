@@ -1,2 +1,0 @@
-# Arianto
-Web programer
