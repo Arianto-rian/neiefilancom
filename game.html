@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Infinity War</title>
+        <style>
+            body {
+    margin: 0;
+    overflow: hidden;
+    color: #eee;
+    background: #eee;
+}
+
+#load
+{
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 12pt;
+    background: #eee;
+}
+
+canvas
+{
+    position: absolute;
+    //top: 50%;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 5px;
+}
+
+.bar
+{
+    position: absolute;
+    //background: red;
+    bottom: 2.5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 5px;
+    //border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    overflow-x: scroll;
+}
+
+.toast
+{
+    position: absolute;
+    height: 30px;
+    width: 180px;
+    left: -180px;
+    //top: 50%;
+    //transform: translateY(-50%);
+    background: #212121;
+    color: #fff;
+    border-radius: 0 3px 3px 0;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 5px;
+    box-sizing: border-box;
+    transition: 0.5s;
+}
+
+.xp
+{
+    position: absolute;
+    right: 20px;
+    font-weight: bold;
+    color: #000;
+}
+
+
+.choosePlayers
+{
+    float: left;
+    border-radius: 10px;
+}
+
+
+.choosePlayers:nth-child(1){
+    opacity: 0.2;
+}
+
+.choosePlayers:nth-child(4){
+    opacity: 0.2;
+}
+
+.sidebar
+{
+    height: 100vh;
+    width: auto;
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    left: -50vw;
+    transition: 0.5s;
+    padding: 0 20px 0 20px;
+    overflow: scroll;
+    z-index: 100;
+}
+
+.cart
+{
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    left: 18px;
+    top: 3px;
+    z-index: 10;
+    border: 1px solid #000;
+    border-radius: 5px;
+    
+}
+
+.cross
+{
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 15pt;
+    background: rgba(0,0,0,0.9);
+}
+.items
+{
+    height: 100px;
+    width: 100%;
+    //background: red;
+    margin: 50px auto;
+    //display: flex;
+    //justify-content: center;
+    //align-items: center;
+    border-top: 1px solid #fff;
+    //border-bottom: 1px solid #fff;
+    
+}
+
+.buyItemImg
+{
+    height: 50px;
+    width: 50px;
+    margin: 0 auto;
+    display: block;
+    position: relative;
+    top: 5px;
+}
+
+.buy
+{
+    position: relative;
+    height: 30px;
+    width: 60px;
+    top: 10%;
+    display: block;
+    bottom: 0px;
+    margin: 10% auto;
+    border-radius: 5px;
+}
+
+.text
+{
+    position: relative;
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    //margin: 5px 0 0 0;
+}
+
+.gm
+{
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+    z-index: 1000;
+}
+
+.btn
+{
+    height: 30px;
+    width: 100px;
+    border: none;
+    background: rgba(0,0,0,0.9);
+    color: #fff;
+}
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
+    </head>
+    <body>
+        <div id="load">Loading... </div>
+        
+        <script>
+            
+
+let H = innerHeight, W = innerWidth;
+let h = H - 150, w = W - 20;
+let barHeight = H - (50 + h);
+let gap = barHeight * 0.2;
+let purchase1 = false;
+let purchase4 = false;
+let inactive = true;
+let inactive1 = true;
+let inactive2 = true;
+let inactive3 = true;
+let showArea = false;
+let players = [];
+let red = false, brown = false, blue = false, green = false;
+let pcount = 2;
+let mainCount1 = 2;
+let mainCount2 = 2;
+let rc = pcount, brc = pcount, bc = pcount, gc = pcount;
+let redsp = [], brsp = [], bsp = [], gsp = [], bimg = [];
+let eimg1 = [], eimg2 = [], eimg3 = [], eimg4 = [];
+let eimgarr = [eimg1, eimg2, eimg3, eimg4];
+let earr = [];
+let pw = 35;
+let bw = 6;
+let bullets = [];
+let bullets1 = [];
+let xp = 0;
+let gm, restart, hide, t, sc;
+
+
+
+
+
+let sprite = {
+    
+    players : [
+    
+        [
+        'https://i.ibb.co/Pz5NmJs/Red-Back1.png', 'https://i.ibb.co/rpmTn5v/Rd-Back2.png',
+        'https://i.ibb.co/4tzMkmy/Red-Back3.png' // red
+        ],
+        [
+             'https://i.ibb.co/cYvP4Lv/Brown-Back1.png',
+             'https://i.ibb.co/59tPGsn/Brown-Back2.png',
+             'https://i.ibb.co/qF13HtX/Brown-Back3.png' // brown
+        ],
+        [
+             'https://i.ibb.co/McSG4bB/Blue-Back1.png',
+             'https://i.ibb.co/sgVv6Wn/Blue-Back2.png',
+             'https://i.ibb.co/rKB5LT3/Blue-Back3.png' // blue
+        ],
+        [
+        'https://i.ibb.co/qj41fdH/Green-Back.png', 'https://i.ibb.co/ry5rsJr/Green-Back1.png',
+        'https://i.ibb.co/28Ljd9c/Green-Back2.png' // green
+        ]
+        
+   
+    ],
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+    enemies : [
+        ['https://i.ibb.co/ch3HBv6/White-Front1.png', 'https://i.ibb.co/bW17CFW/White-Front2.png', 'https://i.ibb.co/VVZhHW3/White-Front3.png'],
+        ['https://i.ibb.co/LYPCdy7/Light-Blue-Front1.png', 'https://i.ibb.co/HG4J7hs/Light-Blue-Front2.png', 'https://i.ibb.co/MDDdJjW/Light-Blue-Front3.png'],
+        ['https://i.ibb.co/94ZSkkQ/Pink-Front1.png', 'https://i.ibb.co/DbMc7Pf/Pink-Front2.png', 'https://i.ibb.co/pbdqc03/Pink-Front3.png'],
+        ['https://i.ibb.co/QK28M1y/Purple-Front1.png', 'https://i.ibb.co/nj5myhT/Purple-Front2.png', 'https://i.ibb.co/SmpWB84/Purple-Front3.png']
+    ],
+    
+    bullet : [
+        'https://i.ibb.co/71JZRPX/Character-Icon-Blue-Left.png',
+        'https://i.ibb.co/BnjwLNs/Character-Icon-Blue-Right.png'
+        
+
+    ]
+    
+}
+
+
+let Aclinks = [
+        'https://i.ibb.co/rsFjnkt/Red-Front1.png',
+        'https://i.ibb.co/CBSk8v2/Brown-Front1.png',
+        'https://i.ibb.co/y0nV3m3/Blue-Front1.png',
+        'https://i.ibb.co/MBn5XQB/Green-Front1.png'
+    ];
+
+
+let bg;
+let divs = document.getElementsByClassName('choosePlayers');
+
+
+function preload(){
+
+    bg = loadImage('https://i.ibb.co/9pM9kPQ/images-2.jpg');
+    
+    for (let i = 0; i < 3; i++){
+        redsp[i] = loadImage(sprite.players[0][i]);
+    }
+    for (let i = 0; i < 3; i++){
+        brsp[i] = loadImage(sprite.players[1][i]);
+    }
+    for (let i = 0; i < 3; i++){
+        bsp[i] = loadImage(sprite.players[2][i]);
+    }
+    for (let i = 0; i < 3; i++){
+        gsp[i] = loadImage(sprite.players[3][i]);
+    }
+    for (let i = 0; i < 2; i++){
+        bimg[i] = loadImage(sprite.bullet[i]);
+    }
+    for (let i = 0; i < 3; i++){
+        eimg1[i] = loadImage(sprite.enemies[0][i]);
+    }
+    for (let i = 0; i < 3; i++){
+        eimg2[i] = loadImage(sprite.enemies[1][i]);
+    }
+    for (let i = 0; i < 3; i++){
+        eimg3[i] = loadImage(sprite.enemies[2][i]);
+    }
+    for (let i = 0; i < 3; i++){
+        eimg4[i] = loadImage(sprite.enemies[3][i]);
+    }
+    
+    
+    hide = true;
+    
+}
+
+function setup(){
+    
+    createCanvas(w, h);
+    
+    if (hide == true){
+        load.style.display = 'none';
+    }
+    
+    createBar();
+    createPlayerToken();
+    createGameOver();
+    
+    gm = document.getElementsByClassName('gm')[0];
+    restart = document.getElementsByClassName('btn')[0];
+    
+    createXP();
+    sc = document.getElementsByClassName('xp')[0];
+    
+    makeSideBar();
+    let div =  document.getElementsByClassName('sidebar')[0];
+    
+    let img = document.getElementsByClassName('cart')[0];
+    img.addEventListener('click', e => {
+        
+        div.style.left = '0';
+        clearInterval(t);
+        noLoop();
+    });
+    
+    let cross = document.getElementsByClassName('cross')[0];
+    cross.addEventListener('click', e => {
+        div.style.left = '-100vw';
+        setInterval(addEnemy, 5000);
+        loop();
+    });
+    
+    
+    
+    let btn = document.getElementsByClassName('buy');
+    for (let i = 0; i < btn.length; i++){
+        /*if (i == 0){
+            if (xp >= 50){
+                
+            }
+        }*/
+        
+        btn[i].addEventListener('click', e => {
+            if (i == 0){
+            if (xp >= 50 && purchase1 == false){
+                divs[0].style.opacity = '1';
+                purchase1 = true;
+                xp -= 50;
+                sc.innerText = 'XP : ' + xp;
+                div.style.left = '-100vw';
+                setInterval(addEnemy, 5000);
+                loop();
+            }
+        }
+        else if (i == 1){
+            if (xp >= 20){
+                brc += 2;
+                mainCount1 = brc;
+                setInterval(addEnemy, 5000);
+                xp -= 20;
+                sc.innerText = 'XP : ' + xp;
+                div.style.left = '-100vw';
+                loop();
+                //console.log(brc);
+            }
+        }
+        else if (i == 2){
+            if (xp >= 20){
+                bc += 2;
+                mainCount2 = bc;
+                setInterval(addEnemy, 5000);
+                xp -= 20;
+                sc.innerText = 'XP : ' + xp;
+                div.style.left = '-100vw';
+                loop();
+                //console.log(brc);
+            }
+        }
+        else if (i == 3){
+            if (xp >= 50 && purchase4 == false){
+                divs[3].style.opacity = '1';
+                purchase4 = true;
+                xp -= 50;
+                sc.innerText = 'XP : ' + xp;
+                div.style.left = '-100vw';
+                setInterval(addEnemy, 5000);
+                loop();
+            }
+        }
+        
+        
+        
+        
+        });
+        
+    }
+    
+    
+    initToast();
+    makeToast('Enjoy the war - Arb!', 1000);
+    
+    
+    for (let i = 0; i < divs.length; i++){
+        divs[i].addEventListener('click', e => {
+            if (i == 1){
+                setBorder('red', divs[i]);
+                //setOpacity('1', divs[i]);
+                setBorder('black', divs[2]);
+                setBorder('black', divs[3]);
+                setBorder('black', divs[0]);
+                
+                brown = true;
+                blue = false;
+                green = false;
+                red = false;
+                
+                if (brc > 0){
+                    showArea = true;
+                }
+                
+                
+                //setOpacity('0.8', divs[2]);
+            }
+            else if (i == 2){
+                setBorder('red', divs[i]);
+                setBorder('black', divs[1]);
+                setBorder('black', divs[3]);
+                setBorder('black', divs[0]);
+                //setOpacity('0.8', divs[1]);
+                
+                blue = true;
+                brown = false;
+                green = false;
+                red = false;
+                
+                
+                if (bc > 0){
+                    showArea = true;
+                }
+                
+                
+            }
+            
+            else if (i == 0){
+                if (purchase1 == true){
+                    setBorder('red', divs[i]);
+                    setBorder('black', divs[1]);
+                    setBorder('black', divs[2]);
+                    setBorder('black', divs[3]);
+                    setOpacity(1, divs[i]);
+                    
+                    
+                    blue = false;
+                    brown = false;
+                    green = false;
+                    red = true;
+                    
+                    if (rc > 0){
+                    showArea = true;
+                }
+                    
+                    
+                }
+                else
+                {
+                    makeToast('Collect 50 Xps to unlock!', 0);
+                }
+            }
+            
+            else if (i == 3){
+                if (purchase4 == true){
+                    setBorder('red', divs[i]);
+                    setBorder('black', divs[1]);
+                    setBorder('black', divs[2]);
+                    setBorder('black', divs[0]);
+                    setOpacity(1, divs[i]);
+                    
+                    blue = false;
+                    brown = false;
+                    green = true;
+                    red = false;
+                    
+                    if (gc > 0){
+                    showArea = true;
+                }
+                    
+                }
+                else
+                {
+                    //console.log('Purchase first');
+                    makeToast('Collect 50 Xps to unlock!', 0);
+                }
+            }
+            
+            //showArea = true;
+        });
+    }
+    
+    
+    
+    
+    let c = document.querySelector('canvas');
+    c.addEventListener('touchstart', e => {
+        let x = Math.floor(e.touches[0].clientX);
+        let y = Math.floor(e.touches[0].clientY) - 50;
+        
+        if (x > 30 && x < w - 30 && y > (h - (h/2 - 75))){
+            
+            // Add Players At this position!!
+            
+            
+            
+            if (blue == true){
+                
+                
+                if (bc > 0){
+                    let p = new Player(x, y, pw, pw, bsp);
+                    players.push(p);
+            
+                    showArea = false;
+                
+                    bc--;
+                    
+                    
+                    
+                }
+                else
+                {
+                    //console.log('Finished!');
+                    makeToast('Please wait!', 000);
+                }
+                
+                
+            }
+           
+            
+             else if (brown == true){
+                
+                if (brc > 0){
+                    let p = new Player(x, y, pw, pw, brsp);
+                    players.push(p);
+            
+                    showArea = false;
+                
+                    brc--;
+                }
+                else
+                {
+                    //console.log('Finished!');
+                    makeToast('Please wait!', 000);
+                }
+                
+            }
+            
+            
+            else if (red == true){
+                
+                if (rc > 0){
+                    let p = new Player(x, y, pw, pw, redsp);
+                    players.push(p);
+            
+                    showArea = false;
+                
+                    rc--;
+                }
+                else
+                {
+                    //console.log('Finished!');
+                    makeToast('Please wait!', 000);
+                }
+                
+            }
+            
+            
+            else if (green == true){
+                if (gc > 0){
+                    let p = new Player(x, y, pw, pw, gsp);
+                    players.push(p);
+            
+                    showArea = false;
+                
+                    gc--;
+                }
+                else
+                {
+                    //console.log('Finished!');
+                    makeToast('Please wait!', 000);
+                }
+            }
+            
+            
+             else
+            {
+                //console.log('Select player!');
+                makeToast('Select player!', 0);
+            }
+            
+            
+        }
+        
+        else
+        {
+            //showArea = true;
+            
+            if (brown == true){
+                    showArea = true;
+              }
+              
+            else if (blue == true){
+                    showArea = true;
+              }
+              
+            else if (red == true){
+                  showArea = true;
+              }
+              
+            else if (green == true){
+                showArea = true;
+            }
+            
+            
+        }
+        
+    });
+    
+    // Xp
+    
+    
+    
+    
+    /// Add Enemy
+    
+    
+    
+    t = setInterval(addEnemy, 5000);addEnemy();
+    
+    function addEnemy(){
+        
+        
+       for (let i = 0; i < 2; i++){
+            let e = new Enemy(random(20, w - 20), -pw, pw, pw, eimgarr[floor(random(0, eimgarr.length))]);
+            earr.push(e);
+        }
+        
+        
+    }
+    
+    
+    
+    restart.addEventListener('click', e => {
+        gm.style.display = 'none';
+        brc = 2;
+        bc = 2;
+        bullets1.splice(0, bullets1.length);
+        bullets.splice(0, bullets.length);
+        players.splice(0, players.length);
+        earr.splice(0, earr.length);
+        
+        if (purchase1 == true){
+            purchase1 = false;
+            divs[0].style.opacity = '0.2';
+        }
+        if (purchase4 == true){
+            purchase4 = false;
+            divs[3].style.opacity = '0.2';
+        }
+        
+        loop();
+        
+    });
+    
+    
+}
+
+
+function collision(a, b) {
+  return a.x < b.x + b.w  && 
+         a.x + a.w > b.x && 
+         a.y < b.y + b.h && 
+         a.y + a.h > b.y;   
+}
+
+
+function draw(){
+    
+    background(bg);
+    
+    //noLoop();
+    
+    
+    stroke('#fff');
+    line(0, h/2, w, h/2);
+    
+    
+    if (showArea){
+        line(20, h - (h/2 - 75), w - 20, h - (h/2 - 75));
+        line(20, h - (h/2 - 75), 20, h);
+        line(w - 20, h - (h/2 - 75), w - 20, h);
+    }
+    
+    
+    for (let i = 0; i < earr.length; i++){
+        earr[i].drawEnemy();
+        earr[i].updateEnemy();
+    }
+    
+    
+    for (let i = 0; i < players.length; i++){
+        players[i].drawPlayer();
+        players[i].updatePlayer();
+    }
+    
+    
+    if (brc < 1){
+        divs[1].style.opacity = '0.2';  
+        
+        if (inactive == true){
+            inactive = false;
+            setTimeout(() => {
+                divs[1].style.opacity = '1';
+                
+                brc = mainCount1;
+                inactive = true;
+                //console.log(brc)
+                
+            }, 3000);
+            
+        }
+        
+    }
+    
+    if (bc < 1){
+        divs[2].style.opacity = '0.2';
+        
+        if (inactive1 == true){
+            inactive1 = false;
+            setTimeout(() => {
+                divs[2].style.opacity = '1';
+                
+                bc = mainCount2;
+                inactive1 = true;
+                //console.log(brc)
+                
+            }, 3000);
+            
+        }
+        
+        
+    }
+    
+    if (rc < 1){
+        divs[0].style.opacity = '0.2';
+        
+        if (inactive2 == true){
+            inactive2 = false;
+            setTimeout(() => {
+                divs[0].style.opacity = '1';
+                
+                rc = pcount;
+                inactive2 = true;
+                //console.log(brc)
+                
+            }, 3000);
+            
+        }
+        
+        
+    }
+    
+    if (gc < 1){
+        divs[3].style.opacity = '0.2';
+        
+        if (inactive3 == true){
+            inactive3 = false;
+            setTimeout(() => {
+                divs[3].style.opacity = '1';
+                
+                gc = pcount;
+                inactive3 = true;
+                //console.log(brc)
+                
+            }, 3000);
+            
+        }
+        
+        
+    }
+    
+    
+    
+    
+    
+    for (let i = 0; i < bullets.length; i++){
+        bullets[i].drawPlayerBullet();
+        bullets[i].bulletUpdate();
+    }
+    
+    for (let i = 0; i < bullets1.length; i++){
+        bullets1[i].drawPlayerBullet();
+        bullets1[i].bulletUpdate();
+    }
+    
+    
+    if (players.length > 0 && frameCount % 20 == 0){
+    
+    
+    
+    for (let i = 0; i < players.length; i++){
+        bullets.push(new PlayerBullet(players[i].x + pw/2 - 5, players[i].y, bw, bw, bimg, 'up'));
+    }
+    
+    
+    }
+    
+    
+    if (earr.length > 0 && frameCount % 20 == 0){
+    
+    
+    
+    for (let i = 0; i < earr.length; i++){
+        bullets1.push(new PlayerBullet(earr[i].x + pw/2 - 5, earr[i].y + pw, bw, bw, bimg, 'down'));
+    }
+    
+    
+    }
+    
+    
+    /// Add more enemy
+    
+    
+    /*if (players.length > 0 && frameCount % 150 == 0){
+        
+        //for (let i = 0; i < players.length; i++){
+            let e = new Enemy(players[players.length - 1].x, -pw, pw, pw, eimgarr[floor(random(0, eimgarr.length))]);
+            
+            earr.push(e);
+            
+        //}
+        
+        
+    }*/
+    
+    
+    //// collision 
+    
+    
+    /*for (let i = 0; i < bullets.length; i++){
+        for (let j = 0; j < earr.length; j++){
+            
+            if (collision(bullets[i], earr[j])){
+                earr[j].health -= 0.3;
+                bullets.splice(i, 1);
+            }
+            
+        }
+    }*/
+    
+    
+    for (let i = 0; i < earr.length; i++){
+        for (let j = 0; j < bullets.length; j++){
+            if (collision(earr[i], bullets[j])){
+                earr[i].health -= 3;
+                bullets.splice(j, 1);
+            }
+        }
+    }
+    
+    for (let i = 0; i < players.length; i++){
+        for (let j = 0; j < bullets1.length; j++){
+            if (collision(players[i], bullets1[j])){
+                players[i].health -= 3;
+                bullets1.splice(j, 1);
+            }
+        }
+    }
+    
+    
+    for (let i = 0; i < earr.length; i++){
+        if (earr[i].health < 1){
+            earr.splice(i, 1);
+            xp++;
+            sc.innerText = 'XP : ' + xp;
+        }
+        
+    }
+    
+    for (let i = 0; i < players.length; i++){
+        if (players[i].health < 1){
+            players.splice(i, 1);
+        }
+    }
+    
+    for (let i = 0; i < bullets.length; i++){
+        if (bullets[i].y < 0){
+            bullets.splice(i, 1);
+        }
+    }
+    for (let i = 0; i < bullets1.length; i++){
+        if (bullets1[i].y > h){
+            bullets1.splice(i, 1);
+        }
+    }
+    for (let i = 0; i < players.length; i++){
+        if (players[i].y < -pw){
+            players.splice(i, 1);
+            xp += 3;
+            sc.innerText = 'XP : ' + xp;
+        }
+    }
+    for (let i = 0; i < earr.length; i++){
+        if (earr[i].y > h){
+            earr.splice(i, 1);
+            gm.style.display = 'flex';
+            noLoop();
+        }
+    }
+    
+    
+    
+}
+
+function createBar(){
+    
+    let body = document.getElementsByTagName('body')[0];
+    let div = document.createElement('div');
+    div.style.height = barHeight - gap + 'px';
+    div.style.bottom = gap/2 + 'px';
+    div.style.width = w + 'px';
+    div.classList.add('bar');
+    
+    body.appendChild(div);
+    
+}
+
+
+function createPlayerToken(){
+    
+    let mainDiv = document.getElementsByClassName('bar')[0];
+    
+    
+    for (let i = 0; i < 4; i++){
+        
+        let div = document.createElement('img');
+        
+        let dw = (w/4) - 3;
+        let dh = (barHeight - gap) * 0.95;
+        div.classList.add('choosePlayers');
+        div.style.height = dh + 'px';
+        div.style.width = dw + 'px';
+        //div.src = 'https://i.ibb.co/T8MPmfy/car03.png';
+        div.src = Aclinks[i];
+        
+        div.style.border = '3px solid #000';
+        mainDiv.appendChild(div);
+        
+        
+    }
+    
+}
+
+
+class Player{
+    
+    constructor(x, y, w, h, img){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.img = img;
+        this.index = 0;
+        this.health = 30;
+    }
+    
+    drawPlayer(){
+    
+        //fill(this.color);
+        //rect(this.x, this.y, this.w, this.h);
+        
+        let i = floor(this.index) % this.img.length;
+        
+        image(this.img[i], this.x, this.y, this.w, this.h);
+        
+        noFill();
+        rect(this.x + this.w/10, this.y - 2, 30, 5);
+        fill('green');
+        //noStroke();
+        rect((this.x + this.w/10), this.y - 2, this.health, 5);
+        
+        
+        
+        this.index += 0.1;
+    }
+    
+    updatePlayer(){
+        this.y -= 0.3;
+        
+        if (this.health < 0){
+            this.health = 0;
+        }
+        
+        if (this.health > 30){
+            this.health = 30;
+        }
+        
+    }
+    
+    
+}
+
+
+class Enemy{
+    
+    constructor(x, y, w, h, img){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.img = img;
+        this.index = 0;
+        this.health = 30;
+    }
+    
+    drawEnemy(){
+    
+        //fill(this.color);
+        //rect(this.x, this.y, this.w, this.h);
+        
+        let i = floor(this.index) % this.img.length;
+        
+        image(this.img[i], this.x, this.y, this.w, this.h);
+        
+        noFill();
+        rect(this.x + this.w/10, this.y - 2, 30, 5);
+        fill('green');
+        //noStroke();
+        rect((this.x + this.w/10), this.y - 2, this.health, 5);
+        
+        
+        
+        this.index += 0.1;
+    }
+    
+    updateEnemy(){
+        this.y += 0.3;
+        
+        if (this.health < 0){
+            this.health = 0;
+        }
+        
+        if (this.health > 30){
+            this.health = 30;
+        }
+        
+    }
+    
+    
+}
+
+
+
+class PlayerBullet{
+    constructor(x, y, w, h, img, dir){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.img = img;
+        this.index = 0;
+        this.dir = dir;
+    }
+    
+    drawPlayerBullet(){
+        let i = floor(this.index) % this.img.length;
+        
+        image(this.img[i], this.x, this.y, this.w, this.h);
+        
+        //rect(this.x, this.y, this.w, this.h);
+    }
+    
+    bulletUpdate(){
+        //this.y -= 2;
+        
+        if (this.dir === 'down'){
+            this.y += 3;
+        }
+        else if (this.dir === 'up'){
+            this.y -= 3;
+        }
+        
+        
+    }
+    
+}
+
+
+function setBorder(c, p){
+    p.style.border = '3px solid ' + c;
+}
+
+function setOpacity(c, p){
+    
+    p.style.opacity = c;
+}
+
+
+function initToast(text, delay){
+    let body = document.getElementsByTagName('body')[0];
+    let div = document.createElement('div');
+    div.classList.add('toast');
+    div.innerText = text;
+    div.style.top = h/2 + 38 + 'px';
+    body.appendChild(div);
+}
+
+
+function makeToast(t, d){
+    let div = document.getElementsByClassName('toast')[0];
+    div.innerText = t;
+    
+    
+    setTimeout(() => {
+        div.style.left = '0';
+        
+        setTimeout(() => {
+            div.style.left = '-180px';
+        }, 1000);
+        
+        
+    }, d);
+    
+}
+
+
+function createXP(){
+    
+    let body = document.getElementsByTagName('body')[0];
+    let p = document.createElement('p');
+    p.classList.add('xp');
+    p.innerText = 'XP : ' + xp;
+    body.appendChild(p);
+    
+}
+
+
+function makeSideBar(){
+    let body = document.getElementsByTagName('body')[0];
+    let div = document.createElement('div');
+    div.classList.add('sidebar');
+    let cross = document.createElement('div');
+    cross.classList.add('cross');
+    cross.innerText = '×';
+    div.appendChild(cross);
+    
+    let cart = document.createElement('img');
+    cart.classList.add('cart');
+    
+    cart.src = 'https://i.ibb.co/JRKZDD9/images-2.png';
+    
+    for (let i = 0; i < 4; i++){
+        let d = document.createElement('div');
+        d.classList.add('items');
+        
+        let img = document.createElement('img');
+        img.src = Aclinks[i];
+        img.classList.add('buyItemImg');
+        
+        let btn = document.createElement('button');
+        btn.classList.add('buy');
+        btn.innerText = 'BUY';
+        
+       let text = document.createElement('p');
+       text.classList.add('text');
+       
+       let texts = ['Use 50 Xps to Unlock!', '2 Browns with 20 Xps!', '2 Blues with 20 Xps!', 'Use 50 Xps to Unlock!'];
+       
+       
+       text.innerText = texts[i];
+       
+        
+        d.appendChild(img);
+        d.appendChild(btn);
+        d.appendChild(text); 
+        
+        
+        div.appendChild(d);
+    }
+    
+    body.appendChild(div);
+    body.appendChild(cart);
+    
+    
+}
+
+
+function createGameOver(){
+    
+    let body = document.getElementsByTagName('body')[0];
+    let div = document.createElement('div');
+    div.classList.add('gm');
+    let btn = document.createElement('button');
+    btn.innerText = 'RESTART';
+    btn.classList.add('btn');
+    div.appendChild(btn);
+    body.appendChild(div);
+    
+}
+
+        </script>
+    </body>
+</html>
